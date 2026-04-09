@@ -1,10 +1,7 @@
 {
-    "name": "GameScripts",
+    "name": "InputDef",
     "rootNamespace": "",
     "references": [
-        "GUID:6055be8ebefd69e48b49212b09b47b2f",
-        "GUID:6546d7765b4165b40850b3667f981c26",
-        "GUID:af04632c77ffa434a8b13fa6f3df4f01",
         "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
