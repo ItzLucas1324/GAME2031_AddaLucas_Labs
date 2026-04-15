@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using TMPro;
+using System;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
@@ -9,25 +9,25 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float maxSpeed = 5;
 
-    [SerializeField] private TMP_Text scoreText;
-
     private Rigidbody2D rb2D;
 
     private float input;
 
-    private int score;
+    public int health;
 
     private PlayerInput playerInput;
+
+    GameManager gameManager;
+
+    public event Action playerDeath;
+
+    public event Action<int> takeDamage;
 
     private void Awake()
     {
         playerInput = new PlayerInput();
         rb2D = GetComponent<Rigidbody2D>();
-    }
-
-    private void Start()
-    {
-        SetScore(0);
+        gameManager = FindFirstObjectByType<GameManager>();
     }
 
     private void OnEnable()
@@ -51,29 +51,36 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (Mathf.Abs(rb2D.linearVelocityX) <= maxSpeed)
+        if (gameManager.isAlive)
         {
-            rb2D.AddForceX(input * moveForce);
-        }
-        else
-        {
-            if (Mathf.Sign(input) != Mathf.Sign(rb2D.linearVelocityY))
+            if (Mathf.Abs(rb2D.linearVelocityX) <= maxSpeed)
             {
                 rb2D.AddForceX(input * moveForce);
             }
+            else
+            {
+                if (Mathf.Sign(input) != Mathf.Sign(rb2D.linearVelocityX))
+                {
+                    rb2D.AddForceX(input * moveForce);
+                }
+            }
         }
-            
     }
 
-    private void SetScore(int newScore)
+    public void OnHit()
     {
-        this.score = newScore;
+        health--;
 
-        scoreText.text = $"Score: {newScore}";
+        if (health <= 0)
+        {
+            Death();
+        }
+
+        takeDamage?.Invoke(health);
     }
 
-    public void IncrementScore(int incrementor)
+    public void Death()
     {
-        SetScore(this.score + incrementor);
+        playerDeath?.Invoke();
     }
 }
